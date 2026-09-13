@@ -123,6 +123,14 @@ export type AcpParsedSessionEvent =
       readonly _tag: "ThoughtDelta";
       readonly text: string;
       readonly rawPayload: unknown;
+    }
+  | {
+      readonly _tag: "UsageUpdated";
+      /** Tokens currently in context. */
+      readonly used: number;
+      /** Total context window size in tokens. */
+      readonly size: number;
+      readonly rawPayload: unknown;
     };
 
 type AcpSessionSetupResponse =
@@ -874,6 +882,17 @@ export function parseSessionUpdateEvent(params: EffectAcpSchema.SessionNotificat
         events.push({
           _tag: "ThoughtDelta",
           text: upd.content.text,
+          rawPayload: params,
+        });
+      }
+      break;
+    }
+    case "usage_update": {
+      if (Number.isFinite(upd.used) && Number.isFinite(upd.size) && upd.size > 0) {
+        events.push({
+          _tag: "UsageUpdated",
+          used: upd.used,
+          size: upd.size,
           rawPayload: params,
         });
       }

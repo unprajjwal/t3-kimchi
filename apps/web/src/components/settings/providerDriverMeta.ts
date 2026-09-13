@@ -4,6 +4,7 @@ import {
   CodexSettings,
   CursorSettings,
   GrokSettings,
+  KimchiSettings,
   OpenCodeSettings,
   ProviderDriverKind,
 } from "@t3tools/contracts";
@@ -14,6 +15,7 @@ import {
   CursorIcon,
   GrokIcon,
   type Icon,
+  KimchiIcon,
   OpenAI,
   OpenCodeIcon,
 } from "../Icons";
@@ -69,6 +71,13 @@ const PROVIDER_CLIENT_DEFINITIONS: readonly ProviderClientDefinition[] = [
     icon: GrokIcon,
     badgeLabel: "Early Access",
     settingsSchema: GrokSettings,
+  },
+  {
+    value: ProviderDriverKind.make("kimchi"),
+    label: "Kimchi",
+    icon: KimchiIcon,
+    badgeLabel: "Early Access",
+    settingsSchema: KimchiSettings,
   },
   {
     value: ProviderDriverKind.make("opencode"),

@@ -263,6 +263,7 @@ const PersistedOptionalProviderSettings = Schema.Struct({
     Schema.Struct({
       cursor: Schema.optionalKey(Schema.Struct({ enabled: Schema.optionalKey(Schema.Boolean) })),
       grok: Schema.optionalKey(Schema.Struct({ enabled: Schema.optionalKey(Schema.Boolean) })),
+      kimchi: Schema.optionalKey(Schema.Struct({ enabled: Schema.optionalKey(Schema.Boolean) })),
       opencode: Schema.optionalKey(Schema.Struct({ enabled: Schema.optionalKey(Schema.Boolean) })),
     }),
   ),
@@ -291,6 +292,7 @@ function restoreUsedProviders(
       instance.enabled === undefined &&
       (instance.driver === "cursor" ||
         instance.driver === "grok" ||
+        instance.driver === "kimchi" ||
         instance.driver === "opencode") &&
       usedProviderInstances.has(instanceId)
         ? { ...instance, enabled: true }
@@ -309,6 +311,10 @@ function restoreUsedProviders(
       grok: {
         ...settings.providers.grok,
         enabled: persisted.providers?.grok?.enabled ?? usedProviders.has("grok"),
+      },
+      kimchi: {
+        ...settings.providers.kimchi,
+        enabled: persisted.providers?.kimchi?.enabled ?? usedProviders.has("kimchi"),
       },
       opencode: {
         ...settings.providers.opencode,
@@ -329,7 +335,13 @@ function fallbackTextGenerationProvider(settings: ServerSettings): ServerSetting
   // Same precedence as isModelSelectionProviderEnabled: an explicit provider
   // instance wins over the legacy providers map, which decodes to defaults
   // (codex enabled) when the Providers UI has only written providerInstances.
+  // Kimchi is excluded: its textGeneration implementation always fails, so
+  // picking it here would silently break commit-message/PR/title generation
+  // for anyone who enables only Kimchi.
   const fallbackEntry = Object.entries(settings.providers).find(([driver, provider]) => {
+    if (driver === "kimchi") {
+      return false;
+    }
     const instance = settings.providerInstances[ProviderInstanceId.make(driver)];
     return instance === undefined ? provider.enabled : resolveProviderInstanceEnabled(instance);
   });
@@ -367,6 +379,7 @@ const PERSISTED_SERVER_SETTINGS_DEFAULTS = {
     ...DEFAULT_SERVER_SETTINGS.providers,
     cursor: { ...DEFAULT_SERVER_SETTINGS.providers.cursor, enabled: undefined },
     grok: { ...DEFAULT_SERVER_SETTINGS.providers.grok, enabled: undefined },
+    kimchi: { ...DEFAULT_SERVER_SETTINGS.providers.kimchi, enabled: undefined },
     opencode: { ...DEFAULT_SERVER_SETTINGS.providers.opencode, enabled: undefined },
   },
 };
@@ -592,13 +605,13 @@ const make = Effect.gen(function* () {
         provider_name AS "providerName",
         provider_instance_id AS "providerInstanceId"
       FROM projection_thread_sessions
-      WHERE provider_name IN ('cursor', 'grok', 'opencode')
+      WHERE provider_name IN ('cursor', 'grok', 'kimchi', 'opencode')
       UNION
       SELECT DISTINCT
         provider_name AS "providerName",
         provider_instance_id AS "providerInstanceId"
       FROM provider_session_runtime
-      WHERE provider_name IN ('cursor', 'grok', 'opencode')
+      WHERE provider_name IN ('cursor', 'grok', 'kimchi', 'opencode')
     `.pipe(
       Effect.mapError(
         (cause) =>

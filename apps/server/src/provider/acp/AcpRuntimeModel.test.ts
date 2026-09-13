@@ -276,6 +276,41 @@ describe("AcpRuntimeModel", () => {
     ]);
   });
 
+  it("projects the unstable ACP usage_update notification", () => {
+    const notification = {
+      sessionId: "session-1",
+      update: {
+        sessionUpdate: "usage_update",
+        used: 18389,
+        size: 262144,
+      },
+    } satisfies EffectAcpSchema.SessionNotification;
+
+    const result = parseSessionUpdateEvent(notification);
+
+    expect(result.events).toEqual([
+      {
+        _tag: "UsageUpdated",
+        used: 18389,
+        size: 262144,
+        rawPayload: notification,
+      },
+    ]);
+  });
+
+  it("ignores a usage_update with a non-positive context window size", () => {
+    const result = parseSessionUpdateEvent({
+      sessionId: "session-1",
+      update: {
+        sessionUpdate: "usage_update",
+        used: 0,
+        size: 0,
+      },
+    } satisfies EffectAcpSchema.SessionNotification);
+
+    expect(result.events).toEqual([]);
+  });
+
   it("projects typed ACP plan and content updates", () => {
     const planResult = parseSessionUpdateEvent({
       sessionId: "session-1",

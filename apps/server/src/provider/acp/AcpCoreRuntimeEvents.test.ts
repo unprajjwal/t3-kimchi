@@ -8,6 +8,7 @@ import {
   makeAcpRequestOpenedEvent,
   makeAcpRequestResolvedEvent,
   makeAcpToolCallEvent,
+  makeAcpUsageUpdatedEvent,
 } from "./AcpCoreRuntimeEvents.ts";
 
 describe("AcpCoreRuntimeEvents", () => {
@@ -136,6 +137,23 @@ describe("AcpCoreRuntimeEvents", () => {
         payload: { requestType: "dynamic_tool_call" },
       });
     }
+  });
+
+  it("maps ACP usage_update notifications to thread.token-usage.updated", () => {
+    const stamp = { eventId: "event-1" as never, createdAt: "2026-03-27T00:00:00.000Z" };
+
+    expect(
+      makeAcpUsageUpdatedEvent({
+        stamp,
+        provider: ProviderDriverKind.make("kimchi"),
+        threadId: "thread-1" as never,
+        used: 18389,
+        size: 262144,
+      }),
+    ).toMatchObject({
+      type: "thread.token-usage.updated",
+      payload: { usage: { usedTokens: 18389, maxTokens: 262144 } },
+    });
   });
 
   it("maps ACP core plan, tool-call, and content updates", () => {

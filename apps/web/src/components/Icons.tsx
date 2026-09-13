@@ -273,6 +273,27 @@ export const GrokIcon: Icon = ({ className, ...props }) => (
   </svg>
 );
 
+/**
+ * Placeholder monogram until Kimchi's real brand asset is wired in: a ring
+ * (drawn as a donut path so it works with a single inherited `fill`, like
+ * every other icon here) around a simple "K" glyph built from rectangles.
+ */
+export const KimchiIcon: Icon = ({ className, ...props }) => (
+  <svg
+    {...props}
+    viewBox="0 0 24 24"
+    fill="none"
+    className={cn("fill-[#0F0F0F] dark:fill-[#F5F5F5]", className)}
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Zm0-1.6a8.4 8.4 0 1 0 0-16.8 8.4 8.4 0 0 0 0 16.8Z"
+    />
+    <path d="M8.4 7.2h1.7v3.9l3.6-3.9h2.2l-3.8 4.1L16 16.8h-2.2l-2.9-4-.8.85v3.15H8.4V7.2Z" />
+  </svg>
+);
+
 export const TraeIcon: Icon = (props) => (
   <svg {...props} viewBox="0 0 24 24" fill="currentColor">
     {/* Back rectangle: left strip + bottom strip drawn separately — empty bottom-left corner is the gap between them */}

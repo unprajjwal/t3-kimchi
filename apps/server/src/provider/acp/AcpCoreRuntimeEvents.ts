@@ -123,6 +123,29 @@ export function makeAcpRequestResolvedEvent(input: {
   };
 }
 
+export function makeAcpUsageUpdatedEvent(input: {
+  readonly stamp: AcpEventStamp;
+  readonly provider: ProviderDriverKind;
+  readonly threadId: ThreadId;
+  /** Tokens currently in context. */
+  readonly used: number;
+  /** Total context window size in tokens. */
+  readonly size: number;
+}): ProviderRuntimeEvent {
+  return {
+    type: "thread.token-usage.updated",
+    ...input.stamp,
+    provider: input.provider,
+    threadId: input.threadId,
+    payload: {
+      usage: {
+        usedTokens: input.used,
+        maxTokens: input.size,
+      },
+    },
+  };
+}
+
 export function makeAcpPlanUpdatedEvent(input: {
   readonly stamp: AcpEventStamp;
   readonly provider: ProviderDriverKind;
