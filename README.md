@@ -1,4 +1,16 @@
-# T3 Code
+# T3 Kimchi
+
+T3 Kimchi is our internal fork of [T3 Code](https://github.com/pingdotgg/t3code), built and released from this repo for our own org.
+
+### Install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/unprajjwal/t3-kimchi/main/scripts/install.sh | bash
+```
+
+Downloads the latest desktop build for your OS (macOS or Linux) and installs it. Run `t3-kimchi` any time afterward to reopen the app.
+
+---
 
 T3 Code is an "agent harness control surface". It enables control of the agents on your machine with a best-in-class mobile app ([iOS](https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824), [Android](https://play.google.com/store/apps/details?id=com.t3tools.t3code)), [web app](https://app.t3.codes) and [Electron-based desktop app](https://t3.codes).
 
